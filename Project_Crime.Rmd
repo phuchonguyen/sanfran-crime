@@ -11,9 +11,9 @@ library(readr)
 ```
 
 ```{r}
-#raw_name <-  "C:\\Users\\Diana Choi\\Downloads\\train.csv.zip"
-#Crime <- readr::read_csv(raw_name, n_max = 5000000)
-#save(Crime, file = "Crime.rda")
+raw_name <-  "C:\\Users\\Diana Choi\\Downloads\\train.csv.zip"
+Crime <- readr::read_csv(raw_name, n_max = 5000000)
+save(Crime, file = "Crime.rda")
 load("Crime.rda")
 Test_Crime <-
   Crime %>% 
@@ -22,5 +22,10 @@ Test_Crime <-
   mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
   filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT")) %>%
   sample_n(size = 10000)
+
+Test_Crime
+names(Test_Crime)
+
+
 
 ```
