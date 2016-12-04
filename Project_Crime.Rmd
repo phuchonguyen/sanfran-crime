@@ -29,3 +29,20 @@ names(Test_Crime)
 
 
 ```
+
+```{r}
+samplesize <- floor(0.75 * nrow(Crime))
+set.seed(123)
+all_indices = c(1:nrow(Crime))
+train_indices = sample(seq_len(nrow(Crime)), size = samplesize)
+test_indices = setdiff(all_indices, train_indices)
+all( ! test_indices %in% train_indices)
+
+
+# These are DATA FRAMES (DATA)
+Train_data = Crime[train_indices, ]      
+Test_data = Crime[test_indices, ] 
+# Train_data
+# Test_data
+```
+
