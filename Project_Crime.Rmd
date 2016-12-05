@@ -30,7 +30,6 @@ names(Crime)
 ```
 
 ```{r}
-
 samplesize <- floor(0.75 * nrow(Crime))
 set.seed(123)
 all_indices = c(1:nrow(Crime))
@@ -41,10 +40,10 @@ all( ! test_indices %in% train_indices)
 
 # These are DATA FRAMES (DATA)
 # Train_data
-Train_data = Crime[train_indices, ]
-save(Train_data, file="Train_crime.rda")
+Train_crime = Crime[train_indices, ]
+save(Train_crime, file="Train_crime.rda")
 # Test_data
-Test_data = Crime[test_indices, ] 
-save(Test_data, file="Test_crime.rda")
+Test_crime = Crime[test_indices, ] 
+save(Test_crime, file="Test_crime.rda")
 ```
 
