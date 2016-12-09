@@ -1,0 +1,38 @@
+---
+title: "SVM"
+author: "Phuc Nguyen"
+date: "12/8/2016"
+output: html_document
+---
+
+```{r}
+library(e1071)
+load("Crime.rda")
+Crime <-
+  Crime %>% 
+  group_by(Category) %>%
+  filter(n() > 20000) %>%
+  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
+  filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT")) %>%
+  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1, 2)) %>%
+  sample_n(size = 10000)
+```
+
+```{r}
+samplesize <- floor(0.75 * nrow(Crime))
+set.seed(123)
+all_indices = c(1:nrow(Crime))
+train_indices = sample(seq_len(nrow(Crime)), size = samplesize)
+test_indices = setdiff(all_indices, train_indices)
+all( ! test_indices %in% train_indices)
+Train_data = Crime[train_indices, ]      
+Test_data = Crime[test_indices, ] 
+```
+
+```{r}
+mod <- svm(as.factor(Category) ~ day_num + X + Y + hour, data=Train_data, kernel = "radial", cost = 10)
+pred <- predict(mod, newdata=Test_data)
+foo <- table(Test_data$Category, pred)
+foo
+1- (sum(diag(foo))/sum(foo))
+```
