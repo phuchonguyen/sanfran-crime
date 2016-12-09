@@ -1,0 +1,188 @@
+---
+title: "Tree Analysis"
+author: "Katja"
+date: "December 9, 2016"
+output: html_document
+---
+
+```{r include = FALSE}
+library(dplyr)
+library(readr)
+```
+
+```{r}
+raw_name <-  "C:\\Users\\Diana Choi\\Downloads\\train.csv.zip"
+Crime <- readr::read_csv(raw_name, n_max = 5000000)
+save(Crime, file = "Crime.rda")
+load("Crime.rda")
+Test_Crime <-
+  Crime %>% 
+  group_by(Category) %>%
+  filter(n() > 20000) %>%
+  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
+  filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT")) %>%
+  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1,2)) %>%
+  ungroup()
+  sample_n(size = 10000)
+
+Test_Crime
+names(Test_Crime)
+
+
+
+```
+
+```{r}
+samplesize <- floor(0.75 * nrow(Test_Crime))
+set.seed(123)
+all_indices = c(1:nrow(Test_Crime))
+train_indices = sample(seq_len(nrow(Test_Crime)), size = samplesize)
+test_indices = setdiff(all_indices, train_indices)
+all( ! test_indices %in% train_indices)
+
+
+# These are DATA FRAMES (DATA)
+Train_data = Test_Crime[train_indices, ]      
+Test_data = Test_Crime[test_indices, ] 
+
+```
+
+## TRAINING TREE
+```{r}
+#library(rpart)
+
+tree.Train_hour_day = rpart(Category~hour+day_num, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_hour_day) #Just Larceny
+pred = predict(tree.Train_hour_day, newdata = Test_data)
+
+tree.Train_hour_mo = rpart(Category ~ hour + month, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_hour_mo) #Just larceny
+pred2 = predict(tree.Train_hour_mo, newdata = Test_data)
+
+tree.Train_hour_X = rpart(Category~hour+X, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_hour_X) 
+pred3 = predict(tree.Train_hour_X,newdata = Test_data)
+printcp(tree.Train_hour_X)
+
+tree.Train_hour_Y = rpart(Category ~ hour + Y, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_hour_Y)
+pred4 = predict(tree.Train_hour_Y, newdata = Test_data)
+printcp(tree.Train_hour_Y)
+
+tree.Train_day_mo = rpart(Category ~ day_num + month, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_day_mo) # Just Larceny
+pred5 = predict(tree.Train_day_mo, newdata = Test_data)
+
+tree.Train_day_X = rpart(Category~day_num + X, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_day_X)
+pred6 = predict(tree.Train_day_X, newdata = Test_data)
+printcp(tree.Train_day_X)
+
+tree.Train_day_Y = rpart(Category ~ day_num + Y, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_day_Y)
+pred7 = predict(tree.Train_day_Y, type= "class", newdata = Test_data)
+conf_mat7 = table(Test_data$Category, pred7)
+perc7 = 1 - (sum(diag(conf_mat7))/sum(conf_mat7))
+
+tree.Train_mo_X = rpart(Category ~ month+X, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_mo_X)
+pred8 = predict(tree.Train_mo_X, type = "class", newdata = Test_data)
+conf_mat8 = table(Test_data$Category, pred8)
+perc8 = 1-(sum(diag(conf_mat8))/sum(conf_mat8))
+
+tree.Train_mo_Y = rpart(Category~month+Y, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_mo_Y)
+pred9 = predict(tree.Train_mo_Y, type = "class", newdata = Test_data)
+conf_mat9 = table(Test_data$Category, pred9)
+perc9 = 1 - (sum(diag(conf_mat9)/sum(conf_mat9)))
+
+tree.Train_X_Y = rpart(Category~X+Y, data = Train_data, cp =0.001)
+rpart.plot::prp(tree.Train_X_Y)
+pred10 = predict(tree.Train_X_Y, type = "class", newdata = Test_data)
+conf_mat10 = table(Test_data$Category, pred10)
+perc10 = 1- (sum(diag(conf_mat10))/sum(conf_mat10))
+
+tree.Train_Everything = rpart(Category~X+Y+month+day_num+hour, data = Train_data, cp = 0.001)
+rpart.plot::prp(tree.Train_Everything)
+pred11 = predict(tree.Train_Everything, type = "class", newdata = Test_data)
+
+conf_mat11 = table(Test_data$Category, pred11)
+perc11 = 1 - (sum(diag(conf_mat11)) / sum(conf_mat11))
+
+```
+
+
+
+## JUST LOOKING AT ASSAULT, DRUG/NARCOTIC, LARCENY/THEFT
+```{r}
+Test_Crime1 <-
+  Crime %>% 
+  group_by(Category) %>%
+  filter(n() > 20000) %>%
+  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
+  filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC","ASSAULT")) %>%
+  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1,2)) %>%
+  ungroup()
+  sample_n(size = 100)
+  
+  Test_Crime1
+  names(Test_Crime1)
+  
+  samplesize <- floor(0.75 * nrow(Test_Crime1))
+set.seed(123)
+all_indices1 = c(1:nrow(Test_Crime1))
+train_indices1 = sample(seq_len(nrow(Test_Crime1)), size = samplesize)
+test_indices1 = setdiff(all_indices1, train_indices1)
+all( ! test_indices1 %in% train_indices1)
+
+
+# These are DATA FRAMES (DATA)
+Train_data1 = Test_Crime1[train_indices1, ]      
+Test_data1 = Test_Crime1[test_indices1, ] 
+  
+
+tree.Train_Top3 = rpart(Category~X+Y+month+day_num+hour, data = Train_data1, cp = 0.001)
+rpart.plot::prp(tree.Train_Top3)
+predT3 = predict(tree.Train_Top3, type = "class", newdata = Test_data1)
+conf_matTop3 = table(Test_data1$Category, predT3)
+percT3 = 1 - (sum(diag(conf_matTop3))/sum(conf_matTop3))
+
+```
+
+
+## JUST BOTTOM TWO LEAST COMMON
+
+```{r}
+Test_Crime2 <-
+  Crime %>% 
+  group_by(Category) %>%
+  filter(n() > 20000) %>%
+  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
+  filter(Category %in% c("BURGLARY", "ROBBERY")) %>%
+  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1,2)) %>%
+  ungroup()
+  sample_n(size = 100)
+  
+  Test_Crime2
+  names(Test_Crime2)
+  
+  samplesize <- floor(0.75 * nrow(Test_Crime2))
+set.seed(123)
+all_indices2 = c(1:nrow(Test_Crime2))
+train_indices2 = sample(seq_len(nrow(Test_Crime2)), size = samplesize)
+test_indices2 = setdiff(all_indices2, train_indices2)
+all( ! test_indices2 %in% train_indices2)
+
+
+# These are DATA FRAMES (DATA)
+Train_data2 = Test_Crime2[train_indices2, ]      
+Test_data2 = Test_Crime2[test_indices2, ] 
+
+
+tree.Train_Bot2 = rpart(Category~X+Y+month+day_num+hour, data = Train_data2, cp= 0.001)
+rpart.plot::prp(tree.Train_Bot2)
+predB2 = predict(tree.Train_Bot2, type = "class", newdata = Test_data2)
+conf_matBot2 = table(Test_data2$Category, predB2)
+percB2 = 1- (sum(diag(conf_matBot2))/sum(conf_matBot2))
+
+```
