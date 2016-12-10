@@ -33,7 +33,7 @@ Train_crime %>%
 ```{r}
 #Linear Discriminant Analysis
 mod_lda <- lda(Category~ DayOfWeek + X + Y + hour + month, data=Train_crime)
-pred_lda <- predict(mod_lda, newdata=Test_crime)
+pred_lda <- predict(mod_lcda, newdata=Test_crime)
 table(Test_crime$Category, pred_lda$class)
 ```
 
