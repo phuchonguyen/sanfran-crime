@@ -1,0 +1,150 @@
+---
+title: '112916'
+author: "Yunjae"
+date: "November 29, 2016"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(readr)
+library(class)
+```
+
+```{r}
+load("Crime.rda")
+Crime <-
+  Crime %>% 
+  group_by(Category) %>%
+  filter(n() > 20000) %>%
+  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
+  filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT")) %>%
+  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1, 2)) %>%
+  sample_n(size = 10000)
+
+```
+
+
+```{r}
+samplesize <- floor(0.75 * nrow(Crime))
+set.seed(123)
+all_indices = c(1:nrow(Crime))
+train_indices = sample(seq_len(nrow(Crime)), size = samplesize)
+test_indices = setdiff(all_indices, train_indices)
+all( ! test_indices %in% train_indices)
+
+
+# These are DATA FRAMES (DATA)
+Train_data = Crime[train_indices, ]      
+Test_data = Crime[test_indices, ] 
+```
+
+
+```{r} 
+Train_outcome <- Train_data$Category
+Test_outcome <- Test_data$Category
+Train_matrix = as.matrix(Train_data[ , c("day_num", "X", "Y", "hour")])
+Test_matrix =  as.matrix(Test_data[ , c("day_num", "X", "Y","hour")])
+```
+
+
+```{r}
+knn.pred = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 1)
+foo <- table(knn.pred, Test_outcome)
+1 - (sum(diag(foo))/ sum(foo))
+
+
+knn.pred50 = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 50)
+foo50 <- table(knn.pred50, Test_outcome)
+1 - (sum(diag(foo50))/ sum(foo50))
+
+
+knn.pred100 = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 100)
+foo100 <- table(knn.pred100, Test_outcome)
+1 - (sum(diag(foo100))/ sum(foo100))
+
+=======
+---
+title: '112916'
+author: "Yunjae"
+date: "November 29, 2016"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(readr)
+library(class)
+```
+
+```{r}
+#raw_name <-  "C:\\Users\\Diana Choi\\Downloads\\train.csv.zip"
+#Crime <- readr::read_csv(raw_name, n_max = 5000000)
+#save(Crime, file = "Crime.rda")
+load("Crime.rda")
+Crime <-
+  Crime %>% 
+  group_by(Category) %>%
+  filter(n() > 20000) %>%
+  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
+  filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT")) %>%
+  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1, 2)) %>%
+  sample_n(size = 10000)
+
+```
+
+
+```{r}
+samplesize <- floor(0.75 * nrow(Crime))
+set.seed(123)
+all_indices = c(1:nrow(Crime))
+train_indices = sample(seq_len(nrow(Crime)), size = samplesize)
+test_indices = setdiff(all_indices, train_indices)
+all( ! test_indices %in% train_indices)
+
+
+# These are DATA FRAMES (DATA)
+Train_data = Crime[train_indices, ]      
+Test_data = Crime[test_indices, ] 
+```
+
+
+```{r} 
+Train_outcome <- Train_data$Category
+Test_outcome <- Test_data$Category
+Train_matrix = as.matrix(Train_data[ , c("day_num", "X", "Y", "hour")])
+Test_matrix =  as.matrix(Test_data[ , c("day_num", "X", "Y","hour")])
+```
+
+
+```{r}
+knn.pred = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 1)
+foo <- table(knn.pred, Test_outcome)
+1 - (sum(diag(foo))/ sum(foo))
+
+
+knn.pred50 = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 50)
+foo50 <- table(knn.pred50, Test_outcome)
+1 - (sum(diag(foo50))/ sum(foo50))
+
+
+knn.pred100 = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 100)
+foo100 <- table(knn.pred100, Test_outcome)
+1 - (sum(diag(foo100))/ sum(foo100))
+
+```
+
+
+
+```{r}
+
+testerrorknn = numeric(100)
+for (i in 1:100)){
+  knn.pred = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = i)
+  foo <- table(knn.pred, Test_outcome)
+  testerrorknn[i] = 1 - (sum(diag(foo))/ sum(foo))
+}
+  
+plot(1:100, testerrorknn)
+>>>>>>> db70efbce9ccbc74b2c0de843b4a2a3589201033
+```

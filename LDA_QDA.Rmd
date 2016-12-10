@@ -16,13 +16,16 @@ library(dplyr)
 ```{r}
 #Visualize data
 ggplot(Train_crime, aes(X, Y, colour = Category)) + geom_point(alpha=1/6) + xlim(-122.35, -122.55) + ylim(37.7,37.85)# Why doesn't the plot scale itself??
+ggplot(Train_data, aes(X, Y, colour = Category)) + geom_point(alpha=1/6) + xlim(-122.35, -122.55) + ylim(37.7,37.85)# Why doesn't the plot scale itself??
 
 Train_crime %>%
+Train_data %>%
   group_by(hour, month, Category) %>%
   summarise(total = n()) %>%
   ggplot(aes(month, hour)) + geom_point(aes(colour=Category, size=total))
 
 Train_crime %>%
+Train_data %>%
   group_by(Category, month) %>%
   summarise(total = n()) %>%
   ggplot(aes(month, total)) + geom_path(aes(colour=Category))
@@ -31,10 +34,23 @@ Train_crime %>%
 ```
 
 ```{r}
+Train_data <- Train_data %>% filter(Category %in% c("BURGLARY", "ROBBERY"))
+Test_data <- Test_data %>% filter(Category %in% c("BURGLARY", "ROBBERY"))
+```
+
+
+```{r}
 #Linear Discriminant Analysis
+<<<<<<< HEAD
 mod_lda <- lda(Category~ DayOfWeek + X + Y + hour + month, data=Train_crime)
 pred_lda <- predict(mod_lcda, newdata=Test_crime)
 table(Test_crime$Category, pred_lda$class)
+=======
+mod_lda <- lda(Category~ DayOfWeek + X + Y + hour + month, data=Train_data)
+pred_lda <- predict(mod_lda, newdata=Test_data)
+foo <- table(Test_data$Category, pred_lda$class)
+1 - (sum(diag(foo))/sum(foo))
+>>>>>>> 0c7ce9cee4e2aba05b2f445f070dbb0c035a77a6
 ```
 
 LDA didn't do very well on predicting the categories of crime.
@@ -44,6 +60,10 @@ LDA didn't do very well on predicting the categories of crime.
 mod_qda <- qda(Category~DayOfWeek + X + Y + hour + month, data=Train_crime)
 pred_qda <- predict(mod_qda, newdata=Test_crime)
 table(Test_crime$Category, pred_qda$class)
+mod_qda <- qda(Category~DayOfWeek + X + Y + hour + month, data=Train_data)
+pred_qda <- predict(mod_qda, newdata=Test_data)
+foo <- table(Test_data$Category, pred_qda$class)
+1 - (sum(diag(foo))/sum(foo))
 ```
 
 QDA did even worse. It didn't predict any Theft or Robbery incidents.
