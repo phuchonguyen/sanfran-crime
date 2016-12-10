@@ -29,8 +29,22 @@ Train_data = Crime[train_indices, ]
 Test_data = Crime[test_indices, ] 
 ```
 
+
+```{r}
+load("Train_data.rda")
+load("Test_data.rda")
+```
+
 ```{r}
 mod <- svm(as.factor(Category) ~ day_num + X + Y + hour, data=Train_data, kernel = "radial", cost = 10)
+pred <- predict(mod, newdata=Test_data)
+foo <- table(Test_data$Category, pred)
+foo
+1- (sum(diag(foo))/sum(foo))
+```
+
+```{r}
+mod <- svm(as.factor(Category) ~ day_num + X + Y + hour, data=Train_data, kernel = "sigmoid", cost = 10)
 pred <- predict(mod, newdata=Test_data)
 foo <- table(Test_data$Category, pred)
 foo

@@ -24,9 +24,8 @@ Crime <-
   filter(n() > 20000) %>%
   mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
   filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT")) %>%
+  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1, 2)) %>%
   sample_n(size = 10000)
-
-names(Crime)
 ```
 
 ```{r}
@@ -40,10 +39,10 @@ all( ! test_indices %in% train_indices)
 
 # These are DATA FRAMES (DATA)
 # Train_data
-Train_crime = Crime[train_indices, ]
-save(Train_crime, file="Train_crime.rda")
+Train_data = Crime[train_indices, ]
+save(Train_data, file="Train_data.rda")
 # Test_data
-Test_crime = Crime[test_indices, ] 
-save(Test_crime, file="Test_crime.rda")
+Test_data = Crime[test_indices, ] 
+save(Test_data, file="Test_data.rda")
 ```
 
