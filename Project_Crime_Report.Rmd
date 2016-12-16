@@ -37,7 +37,7 @@ We believe that the differences in the test errors across these KNN, LDA and QDA
 For SVM, the lowest test error was 61% for “radial” type. Again, the more flexible model "radial" performs better than the "linear" model. We used the function tune() to find the optimal parameters: cost = 100, gamma = 2. The optimal parameters also only improve prediction accuracy by one percent from our original guess.
 
 ### Tree:
-For the Tree method, the test error using all five parameters comparable to results of SVM. However, in our confusion matrix, we found that Larceny got the most correct guesses while two other columns (Robbery and Burglary) were never predicted by the model. 
+For the Tree method, the test error of 63% using all five parameters is comparable to results of KNN. However, in our confusion matrix, we found that Larceny got the most correct guesses while two other columns (Robbery and Burglary) were never predicted by the model. 
 
 
 We suspect that some categories were easier to predict because they may be more correlated with location and time than others. 
