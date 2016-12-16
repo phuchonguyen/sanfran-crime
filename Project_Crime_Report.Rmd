@@ -1,0 +1,57 @@
+---
+title: "Prediction of Crime Category in San Francisco"
+author: "Phuc Nguyen, Yun Jae Choi, Katja McKiernan"
+date: "December 16, 2016"
+output: html_document
+---
+
+##Goal:
+
+### Problem Setting:
+
+Our client, the Police Department of San Francisco, wants to identify the type of crimes based on the location, hour, and day of week, so that they can maximize their efficiency in staffing their officers. We believe that our method will allow the Police Department to station the specialized officers to designated areas at particular times. This allows for the placement of officers to have a better chance of preventing crime and have a quicker response time for crimes committed in their location. 
+
+### Qualitative Goal:
+
+Our qualitative goal will be to examine if the likelihood derived from using our models is higher than pure chance. More specifically, out of five types of crime incidents, 20% is the percentage of one type of crime happening at random chance. Our likelihood will have to be higher than 20% to perform better than random chance. 
+
+##The Data:
+
+Our data is about crime incidents in San Francisco from 2003 to 2015. Our data contains the dates, category of the crime, description of each crime incident, day of the week, name of the Police Department District, resolution, address, and longitude and latitude. We decided to use the  “hour” variable as a simplified marker of the time of the crime, the day of the week (whether it was a weekday or weekend), and the location (in longitude and latitude) as our explanatory variables to predict the type of crime commited. The most important predictor variables were X and Y (latitude and longitude) and the hour that the crime occurred in. The response variable was the category of the crime (larceny/theft, assault, drug/narcotic, burglary, robbery etc). We had no missing data, but we shrunk the dataset to a more manageable size by only using the data including the 5 most often occurring crimes. 
+
+Following is the link to the dataset: [link](https://www.kaggle.com/c/sf-crime/data)
+
+##Classification Methods Applied:
+
+We applied several different classification methods to our dataset. The response variables were the five most frequent crime incidents reported ("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT"). We tried five methods: KNN, LDA/QDA, Tree, and SVM and picked the best model of those five by comparing the test errors from validation set.
+
+### KNN:
+For KNN, we tried three different values of k--1, 50, and 100. k = 50 yielded the lowest test error among all “k”s: 64%. The “k” parameter didn’t seem to be the most important to our data because the test error didn’t change dramatically from k = 1 to k = 100. It changed within one or two percent only. 
+
+### LDA and QDA
+We also tried LDA and QDA, which yielded a much higher test error of 74% and 73%, respectively. There were no meta-parameters that we have to set. 
+
+We believe that the differences in the test errors across these KNN, LDA and QDA are due to flexibility. KNN is an a lot more flexible method than LDA or QDA since it is a nonparametric method.  The randomness of crimes in terms of location and time may explain why a more flexible method performs better than a less flexible method.
+
+### SVM:
+For SVM, the lowest test error was 61% for “radial” type. Again, the more flexible model "radial" performs better than the "linear" model. We used the function tune() to find the optimal parameters: cost = 100, gamma = 2. The optimal parameters also only improve prediction accuracy by one percent from our original guess.
+
+### Tree:
+For the Tree method, the test error using all five parameters comparable to results of SVM. However, in our confusion matrix, we found that Larceny got the most correct guesses while two other columns (Robbery and Burglary) were never predicted by the model. 
+
+
+We suspect that some categories were easier to predict because they may be more correlated with location and time than others. 
+
+##Evaluation of Methods:
+
+The qualitative goal of our project is to predict the type of crime with an accuracy rate of higher than 20% so that the police department can send appropriate officers more quickly when a call comes to the department. Our best model produces a model with accuracy rate of 38%. Thus, specialized officers are more likely to arrive at the crime scene quicker and have appropriate action plan to reduce injury or material loss for all parties involved. While this does not guarantee that the department will always send the right specialized officers and action plan, the improvement in saving lives and property of correctly predicted inccidents is still valuable.
+
+##Alternative Approaches:
+
+```{r}
+library(ggplot2)
+load("Train_data.rda")
+ggplot(Train_data, aes(X, Y, colour = Category)) + geom_point(alpha=1/6) + xlim(-122.35, -122.55) + ylim(37.7,37.85)
+```
+
+As one can see from the graph above, some crimes, such as Assault, tend to happen more in the southern part of the city, while Larceny happens a lot in the north west region. In addition, our tree model shows that location is the most important indicator of crime category. Thus, we think a way that we could improve our model is to segment the city into geographic regions and optimize separate models for each regions. 

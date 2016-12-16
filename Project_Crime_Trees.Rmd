@@ -8,48 +8,14 @@ output: html_document
 ```{r include = FALSE}
 library(dplyr)
 library(readr)
-```
-
-```{r}
-raw_name <-  "C:\\Users\\Diana Choi\\Downloads\\train.csv.zip"
-Crime <- readr::read_csv(raw_name, n_max = 5000000)
-save(Crime, file = "Crime.rda")
-load("Crime.rda")
-Test_Crime <-
-  Crime %>% 
-  group_by(Category) %>%
-  filter(n() > 20000) %>%
-  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
-  filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT")) %>%
-  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1,2)) %>%
-  ungroup()
-  sample_n(size = 10000)
-
-Test_Crime
-names(Test_Crime)
-
-
-
-```
-
-```{r}
-samplesize <- floor(0.75 * nrow(Test_Crime))
-set.seed(123)
-all_indices = c(1:nrow(Test_Crime))
-train_indices = sample(seq_len(nrow(Test_Crime)), size = samplesize)
-test_indices = setdiff(all_indices, train_indices)
-all( ! test_indices %in% train_indices)
-
-
-# These are DATA FRAMES (DATA)
-Train_data = Test_Crime[train_indices, ]      
-Test_data = Test_Crime[test_indices, ] 
-
+library(rpart)
+library(rpart.plot)
+load("Train_data.rda")
+load("Test_data.rda")
 ```
 
 ## TRAINING TREE
 ```{r}
-#library(rpart)
 
 tree.Train_hour_day = rpart(Category~hour+day_num, data = Train_data, cp = 0.001)
 rpart.plot::prp(tree.Train_hour_day) #Just Larceny
@@ -111,7 +77,7 @@ perc11 = 1 - (sum(diag(conf_mat11)) / sum(conf_mat11))
 
 ```
 
-
+Test error is about 63%
 
 ## JUST LOOKING AT ASSAULT, DRUG/NARCOTIC, LARCENY/THEFT
 ```{r}

@@ -1,0 +1,62 @@
+---
+title: "LDA and QDA"
+author: "Phuc Nguyen"
+date: "December 4, 2016"
+output: html_document
+---
+
+```{r}
+#load packages and data
+load("Train_data.rda")
+load("Test_data.rda")
+library(MASS)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+#Visualize data
+ggplot(Train_data, aes(X, Y, colour = Category)) + geom_point(alpha=1/6) + xlim(-122.35, -122.55) + ylim(37.7,37.85)# Why doesn't the plot scale itself??
+
+Train_data %>%
+  group_by(hour, month, Category) %>%
+  summarise(total = n()) %>%
+  ggplot(aes(month, hour)) + geom_point(aes(colour=Category, size=total))
+
+Train_data %>%
+  group_by(Category, month) %>%
+  summarise(total = n()) %>%
+  ggplot(aes(month, total)) + geom_path(aes(colour=Category))
+
+
+```
+
+```{r}
+#Only used when wanting to only classify between Burglary and Robbery
+Train_data <- Train_data %>% filter(Category %in% c("BURGLARY", "ROBBERY"))
+Test_data <- Test_data %>% filter(Category %in% c("BURGLARY", "ROBBERY"))
+```
+
+
+```{r}
+#Linear Discriminant Analysis
+
+mod_lda <- lda(Category~ DayOfWeek + X + Y + hour + month, data=Train_data)
+pred_lda <- predict(mod_lda, newdata=Test_data)
+foo <- table(Test_data$Category, pred_lda$class)
+1 - (sum(diag(foo))/sum(foo))
+
+```
+
+LDA didn't do very well on predicting the categories of crime.
+
+```{r}
+#Quadratic Discriminant Analysis, more flexible than LDA
+
+mod_qda <- qda(Category~DayOfWeek + X + Y + hour + month, data=Train_data)
+pred_qda <- predict(mod_qda, newdata=Test_data)
+foo <- table(Test_data$Category, pred_qda$class)
+1 - (sum(diag(foo))/sum(foo))
+```
+
+QDA did even worse. It didn't predict any Theft or Robbery incidents.

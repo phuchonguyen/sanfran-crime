@@ -6,37 +6,12 @@ output: html_document
 ---
 
 ```{r}
+#Load packages and data
 library(dplyr)
 library(readr)
 library(class)
-```
-
-```{r}
-load("Crime.rda")
-Crime <-
-  Crime %>% 
-  group_by(Category) %>%
-  filter(n() > 20000) %>%
-  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
-  filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT")) %>%
-  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1, 2)) %>%
-  sample_n(size = 10000)
-
-```
-
-
-```{r}
-samplesize <- floor(0.75 * nrow(Crime))
-set.seed(123)
-all_indices = c(1:nrow(Crime))
-train_indices = sample(seq_len(nrow(Crime)), size = samplesize)
-test_indices = setdiff(all_indices, train_indices)
-all( ! test_indices %in% train_indices)
-
-
-# These are DATA FRAMES (DATA)
-Train_data = Crime[train_indices, ]      
-Test_data = Crime[test_indices, ] 
+load("Train_data.rda")
+load("Test_data.rda") 
 ```
 
 
@@ -139,12 +114,11 @@ foo100 <- table(knn.pred100, Test_outcome)
 ```{r}
 
 testerrorknn = numeric(100)
-for (i in 1:100)){
+for (i in 1:100){
   knn.pred = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = i)
   foo <- table(knn.pred, Test_outcome)
   testerrorknn[i] = 1 - (sum(diag(foo))/ sum(foo))
 }
   
 plot(1:100, testerrorknn)
->>>>>>> db70efbce9ccbc74b2c0de843b4a2a3589201033
 ```

@@ -1,0 +1,49 @@
+---
+title: "SVM"
+author: "Phuc Nguyen"
+date: "12/8/2016"
+output: html_document
+---
+
+```{r}
+load("Train_data.rda")
+load("Test_data.rda")
+library(e1071)
+```
+## Singular Value Classifier:
+
+Classify crime based on location (X: latitude, Y: longtitude), time (hour) and day of week (day_num)
+
+```{r}
+mod <- svm(as.factor(Category) ~ day_num + X + Y + hour, data=Train_data, kernel = "radial", cost = 10, gamma = 1)
+pred <- predict(mod, newdata=Test_data)
+foo <- table(Test_data$Category, pred)
+foo
+1- (sum(diag(foo))/sum(foo))
+```
+
+Error rate of about 68%. The linear kernel yields higher error rate.
+
+```{r}
+mod <- svm(as.factor(Category) ~ day_num + X + Y + hour, data=Train_data, kernel = "linear", cost = 10)
+pred <- predict(mod, newdata=Test_data)
+foo <- table(Test_data$Category, pred)
+foo
+1- (sum(diag(foo))/sum(foo))
+```
+
+## Tune the svm
+
+```{r}
+tune.mod <- tune(svm, as.factor(Category)~day_num+X+Y+hour, data=Train_data, kernel="radial", ranges=list(cost=c(1,10,100), gamma=c(0.5,1,2)), tunecontrol = tune.control(sampling = "fix", cross=5))
+```
+
+Best cost is 100, gamma is 2
+
+```{r}
+mod <- svm(as.factor(Category) ~ day_num + X + Y + hour, data=Train_data, kernel = "radial", cost = 100, gamma = 2)
+pred <- predict(mod, newdata=Test_data)
+foo <- table(Test_data$Category, pred)
+foo
+1- (sum(diag(foo))/sum(foo))
+```
