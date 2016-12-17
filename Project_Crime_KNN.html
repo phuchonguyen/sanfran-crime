@@ -120,7 +120,8 @@ $(document).ready(function () {
 </div>
 
 
-<pre class="r"><code>library(dplyr)</code></pre>
+<pre class="r"><code>#Load packages and data
+library(dplyr)</code></pre>
 <pre><code>## 
 ## Attaching package: 'dplyr'</code></pre>
 <pre><code>## The following objects are masked from 'package:stats':
@@ -130,29 +131,9 @@ $(document).ready(function () {
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
 <pre class="r"><code>library(readr)
-library(class)</code></pre>
-<pre class="r"><code>#raw_name &lt;-  &quot;C:\\Users\\Diana Choi\\Downloads\\train.csv.zip&quot;
-#Crime &lt;- readr::read_csv(raw_name, n_max = 5000000)
-#save(Crime, file = &quot;Crime.rda&quot;)
-load(&quot;Crime.rda&quot;)
-Crime &lt;-
-  Crime %&gt;% 
-  group_by(Category) %&gt;%
-  filter(n() &gt; 20000) %&gt;%
-  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %&gt;%
-  filter(Category %in% c(&quot;LARCENY/THEFT&quot;, &quot;DRUG/NARCOTIC&quot;, &quot;ROBBERY&quot;, &quot;BURGLARY&quot;, &quot;ASSAULT&quot;)) %&gt;%
-  mutate(day_num = ifelse(DayOfWeek %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;), 1, 2)) %&gt;%
-  sample_n(size = 10000)</code></pre>
-<pre class="r"><code>samplesize &lt;- floor(0.75 * nrow(Crime))
-set.seed(123)
-all_indices = c(1:nrow(Crime))
-train_indices = sample(seq_len(nrow(Crime)), size = samplesize)
-test_indices = setdiff(all_indices, train_indices)
-all( ! test_indices %in% train_indices)</code></pre>
-<pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code># These are DATA FRAMES (DATA)
-Train_data = Crime[train_indices, ]      
-Test_data = Crime[test_indices, ] </code></pre>
+library(class)
+load(&quot;Train_data.rda&quot;)
+load(&quot;Test_data.rda&quot;) </code></pre>
 <pre class="r"><code>Train_outcome &lt;- Train_data$Category
 Test_outcome &lt;- Test_data$Category
 Train_matrix = as.matrix(Train_data[ , c(&quot;day_num&quot;, &quot;X&quot;, &quot;Y&quot;, &quot;hour&quot;)])
@@ -160,15 +141,15 @@ Test_matrix =  as.matrix(Test_data[ , c(&quot;day_num&quot;, &quot;X&quot;, &quo
 <pre class="r"><code>knn.pred = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 1)
 foo &lt;- table(knn.pred, Test_outcome)
 1 - (sum(diag(foo))/ sum(foo))</code></pre>
-<pre><code>## [1] 0.65832</code></pre>
+<pre><code>## [1] 0.66168</code></pre>
 <pre class="r"><code>knn.pred50 = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 50)
 foo50 &lt;- table(knn.pred50, Test_outcome)
 1 - (sum(diag(foo50))/ sum(foo50))</code></pre>
-<pre><code>## [1] 0.6392</code></pre>
+<pre><code>## [1] 0.63872</code></pre>
 <pre class="r"><code>knn.pred100 = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 100)
 foo100 &lt;- table(knn.pred100, Test_outcome)
 1 - (sum(diag(foo100))/ sum(foo100))</code></pre>
-<pre><code>## [1] 0.6492</code></pre>
+<pre><code>## [1] 0.65384</code></pre>
 
 
 

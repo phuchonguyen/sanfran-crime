@@ -3,40 +3,12 @@ title: KNN
 ---
 
 ```{r}
+#Load packages and data
 library(dplyr)
 library(readr)
 library(class)
-```
-
-```{r}
-#raw_name <-  "C:\\Users\\Diana Choi\\Downloads\\train.csv.zip"
-#Crime <- readr::read_csv(raw_name, n_max = 5000000)
-#save(Crime, file = "Crime.rda")
-load("Crime.rda")
-Crime <-
-  Crime %>% 
-  group_by(Category) %>%
-  filter(n() > 20000) %>%
-  mutate(hour = lubridate::hour(Dates), month = lubridate::month(Dates)) %>%
-  filter(Category %in% c("LARCENY/THEFT", "DRUG/NARCOTIC", "ROBBERY", "BURGLARY", "ASSAULT")) %>%
-  mutate(day_num = ifelse(DayOfWeek %in% c("Saturday", "Sunday"), 1, 2)) %>%
-  sample_n(size = 10000)
-
-```
-
-
-```{r}
-samplesize <- floor(0.75 * nrow(Crime))
-set.seed(123)
-all_indices = c(1:nrow(Crime))
-train_indices = sample(seq_len(nrow(Crime)), size = samplesize)
-test_indices = setdiff(all_indices, train_indices)
-all( ! test_indices %in% train_indices)
-
-
-# These are DATA FRAMES (DATA)
-Train_data = Crime[train_indices, ]      
-Test_data = Crime[test_indices, ] 
+load("Train_data.rda")
+load("Test_data.rda") 
 ```
 
 
@@ -63,5 +35,5 @@ knn.pred100 = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = 100)
 foo100 <- table(knn.pred100, Test_outcome)
 1 - (sum(diag(foo100))/ sum(foo100))
 
-```
 
+```
