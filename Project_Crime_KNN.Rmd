@@ -1,8 +1,5 @@
 ---
-title: '112916'
-author: "Yunjae"
-date: "November 29, 2016"
-output: html_document
+title: KNN
 ---
 
 ```{r}
@@ -68,16 +65,3 @@ foo100 <- table(knn.pred100, Test_outcome)
 
 ```
 
-
-
-```{r}
-
-testerrorknn = numeric(100)
-for (i in 1:100)){
-  knn.pred = knn(Train_matrix, as.matrix(Test_matrix), Train_outcome, k = i)
-  foo <- table(knn.pred, Test_outcome)
-  testerrorknn[i] = 1 - (sum(diag(foo))/ sum(foo))
-}
-  
-plot(1:100, testerrorknn)
-```
