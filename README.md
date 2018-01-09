@@ -14,4 +14,4 @@ The dataset contains incidents derived from SFPD Crime Incident Reporting system
 
 ## Final Report:
 
-Download the file Project_Crime_Report_Final.html to see the final report.
+To view the final report, click [here](https://rawgit.com/PhucHNg/sanfran-crime/master/Project_Crime_Report_Final.html).
